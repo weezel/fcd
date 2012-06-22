@@ -1,0 +1,11 @@
+fcd
+test.db
+testdb.txt
+controller
+dirindexer
+tags
+cscope*
+*.txt
+*.swp
+*.o
+*.core
