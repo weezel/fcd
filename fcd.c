@@ -23,10 +23,6 @@ main(int argc, const char *argv[])
 	int		 lflag, ch;
 	long long	 hits;
 	const char	*dirname;
-	/*
-	char		 testikey[KEYLEN];
-	sqlite3		*db;
-	*/
 
 	hits = lflag = 0;
 
@@ -38,7 +34,7 @@ main(int argc, const char *argv[])
 		case 'b': /* Bookmark */
 			lflag = 1;
 			break;
-		case 'd':
+		case 'd': /* Max word difference */
 			break;
 		default: /* No extra options */
 			usage();
@@ -54,9 +50,6 @@ main(int argc, const char *argv[])
 	/*
 	db = db_open(DB_NAME);
 	hits = db_show_matched(db, dirname);
-
-	genkey(testikey);
-	testikey[KEYLEN - 1] = '\0';
 
 	sqlite3_close(db);
 	sqlite3_free(db);

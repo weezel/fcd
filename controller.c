@@ -1,3 +1,7 @@
+/*
+ * Combines sql and curses
+ */
+
 #include <menu.h>
 #include <sqlite3.h>
 

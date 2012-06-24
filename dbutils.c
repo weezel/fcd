@@ -12,7 +12,7 @@
 void
 db_init(void)
 {
-	int	 rc;
+	int	rc;
 
 	if ((rc = sqlite3_open(DB_NAME, &db)) != 0) {
 		err(1, "Cannot open database %s", sqlite3_errmsg(db));
@@ -25,8 +25,8 @@ db_init(void)
 void
 db_get_choice_by_id(const long long choice)
 {
-	int rc;
-	sqlite3_stmt *stmt;
+	int		 rc;
+	sqlite3_stmt	*stmt;
 
 	if ((rc = sqlite3_prepare_v2(db, "SELECT path, dir FROM homedir WHERE id = ?;", -1, &stmt, NULL)))
 		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
@@ -62,7 +62,6 @@ db_fuzzy_match_count(const char *dirname)
 	sqlite3_finalize(stmt);
 
 	return hits;
-
 }
 
 size_t
@@ -100,7 +99,7 @@ db_show_matched(const char *name)
 
 	return hits;
 }
- 
+
 void
 insert_item_to_db(struct diritem *di)
 {
@@ -109,7 +108,7 @@ insert_item_to_db(struct diritem *di)
 	sqlite3_stmt	*stmt;
 
 	q = sqlite3_mprintf("INSERT INTO homedir(path, dir, visits, bookmark) VALUES('%q', '%q', %q, %q);",
-			di->path, di->dname, 0, 0);
+			    di->path, di->dname, 0, 0);
 	#ifdef DEBUG
 	fprintf(stdout, "SQL-SYNTAX: %s\n", q);
 	#endif

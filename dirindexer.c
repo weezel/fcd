@@ -23,10 +23,6 @@
 
 #define DEBUG
 
-long int	directories_added = 0;
-long int	directories_total = 0;
-
-
 struct diritem *alloc_diritem(const char *);
 void free_diritem(struct diritem *);
 int walk_directory(const char *);

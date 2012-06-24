@@ -1,13 +1,11 @@
 fcd
 test.db
 testdb.txt
-controller
-dirindexer
 tags
 cscope*
+testi.c
 *.txt
 *.swp
 *.o
 *.core
-testi.c
-choosewin
+*_test

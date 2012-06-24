@@ -1,10 +1,15 @@
 #ifndef _DBUTILS_H_
 #define _DBUTILS_H_
 
+#include <sqlite3.h>
+#include <stdlib.h>
+
+#include "extern.h"
+
 #define DB_NAME	"test.db"
 #define DB_PATH "/home/weezel/ohj/fcd"
 
-int		 dbisopen;
+int		 dbisopen; // is  > 0 if opened
 sqlite3		*db;
 
 void db_init(void);
