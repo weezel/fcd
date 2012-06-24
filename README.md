@@ -38,6 +38,10 @@ Things I might consider at some point.
 	[ ] Use file descriptors to pass data around (major speed up, but also needs
 	major modifications)
 
+	[ ] Support for configuration file
+
+	[ ] Write SIGWINCH handler
+
 ## DONE:
 	[X] Implement directory walk
 	[X] Implement getopt functionality

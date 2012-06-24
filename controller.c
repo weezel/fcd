@@ -93,14 +93,6 @@ combine_items(const char *dirname, size_t item_count)
 		if ((pathtmp != NULL) && (dnametmp != NULL)) {
 			items[hits] = new_item(dirlist[hits].abspath, dirlist[hits].dname);
 		}
-
-		/* TODO spellcheck
-		if (dflag > 0) {
-			size_t difference = spellcheck(word1, sqlite3_columnt, dflag);
-			if (difference < dlfag)
-				hits++;
-		}
-		*/
 		hits++;
 	}
 	/* terminate the menu */
@@ -115,13 +107,5 @@ combine_items(const char *dirname, size_t item_count)
 	sqlite3_finalize(stmt);
 
 	return m;
-}
-
-int
-main(int argc, const char *argv[])
-{
-	process_query((argc < 3) ? "t" : argv[1]);
-
-	return 0;
 }
 

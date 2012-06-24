@@ -9,3 +9,5 @@ cscope*
 *.swp
 *.o
 *.core
+testi.c
+choosewin

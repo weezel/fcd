@@ -9,12 +9,13 @@ struct dlist {				/* directory list */
 	char	dname[MAXNAMLEN];	/* directory name */
 };
 
-struct dlist *dirlist;
-int hit_max_items;
+int		 dbisopen;
+int		 hit_max_items;
+struct dlist	*dirlist;
 
 void alloc_dlist(size_t);
 void free_dlist(void);
 void process_query(const char *);
-MENU *combine_items(const char *, sqlite3 *, size_t);
+MENU *combine_items(const char *, size_t);
 
 #endif
