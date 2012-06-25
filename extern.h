@@ -7,6 +7,10 @@
 #define MAX_HITS 256
 #define MAX_CHOICESIZE (MAXPATHLEN + MAXNAMLEN)
 
+#define TABLE_HOME "homedir"
+#define TABLE_USR  "usrdir"
+#define TABLE_ETC  "etcdir"
+
 struct diritem {
 	char	path[MAXPATHLEN];
 	char	dname[MAXNAMLEN];

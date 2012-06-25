@@ -41,7 +41,7 @@ db_get_choice_by_id(const long long choice)
 }
 
 size_t
-db_fuzzy_match_count(const char *dirname)
+db_match_count(const char *dirname)
 {
 	int		 rc;
 	size_t		 hits;
@@ -90,6 +90,33 @@ db_show_matched(const char *name)
 				hits++;
 		}
 		*/
+		hits++;
+	}
+
+	if (q)
+		sqlite3_free(q);
+	sqlite3_finalize(stmt);
+
+	return hits;
+}
+
+size_t
+db_find_exact(const char *table, const char *dirname)
+{
+	int		 rc;
+	size_t		 hits;
+	char		*q;
+	sqlite3_stmt	*stmt;
+
+	hits = 0;
+
+	q = sqlite3_mprintf("SELECT id, path, dir FROM %q WHERE dir LIKE '%q';", table, dirname);
+	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
+		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
+
+	while (sqlite3_step(stmt) == SQLITE_ROW) {
+		fprintf(stdout, "%llu%-5s%s  %s\n", sqlite3_column_int64(stmt, 0), "",
+			sqlite3_column_text(stmt, 1), sqlite3_column_text(stmt, 2));
 		hits++;
 	}
 

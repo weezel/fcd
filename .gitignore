@@ -9,3 +9,4 @@ testi.c
 *.o
 *.core
 *_test
+all_tests

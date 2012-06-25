@@ -1,18 +1,28 @@
 #include "dbutils.h"
-#include "dirindexer.h"
+#include "extern.h"
 
 #include <stdio.h>
 
+
+void
+test_walk_directory(void)
+{
+	walk_directory("/home/weezel/ohj");
+}
+
+void
+test_db_find_exact_match(void)
+{
+	db_find_exact(TABLE_HOME, "ui");
+}
 
 int
 main(int argc, const char *argv[])
 {
 	db_init();
-	if (argc < 2)
-		walk_directory("/home/weezel/ohj");
-	else
-		walk_directory(argv[1]);
-	//fprintf(stdout, "Directories added: %zu/%zu\n", directories_added, directories_total);
+
+	//test_walk_directory();
+	test_db_find_exact_match();
 
 	return 0;
 }

@@ -42,7 +42,7 @@ process_query(const char *dirname)
 
 	if (dbisopen < 1)
 		db_init();
-	found = db_fuzzy_match_count(dirname);
+	found = db_match_count(dirname);
 	if (found > MAX_HITS) {
 		found = MAX_HITS;
 		hit_max_items = 1;
