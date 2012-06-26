@@ -14,6 +14,8 @@ void
 test_db_find_exact_match(void)
 {
 	db_find_exact(TABLE_HOME, "ui");
+	db_update_visit_count(TABLE_HOME, "ui");
+	db_find_exact(TABLE_HOME, "ui");
 }
 
 int

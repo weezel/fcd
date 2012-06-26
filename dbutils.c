@@ -110,13 +110,15 @@ db_find_exact(const char *table, const char *dirname)
 
 	hits = 0;
 
-	q = sqlite3_mprintf("SELECT id, path, dir FROM %q WHERE dir LIKE '%q';", table, dirname);
+	q = sqlite3_mprintf("SELECT * FROM %q WHERE dir LIKE '%q';", table, dirname);
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
 		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
 
+	fprintf(stdout, "ID%-5sPATH%-39sDIRECTORY%-12sVISITS%-2sBOOKMARKED\n", "", "", "", "");
 	while (sqlite3_step(stmt) == SQLITE_ROW) {
-		fprintf(stdout, "%llu%-5s%s  %s\n", sqlite3_column_int64(stmt, 0), "",
-			sqlite3_column_text(stmt, 1), sqlite3_column_text(stmt, 2));
+		fprintf(stdout, "%-6llu %-42s %-20s %-7llu %llu\n", sqlite3_column_int64(stmt, 0),
+			sqlite3_column_text(stmt, 1), sqlite3_column_text(stmt, 2),
+			sqlite3_column_int64(stmt, 3), sqlite3_column_int64(stmt, 4));
 		hits++;
 	}
 
@@ -142,8 +144,6 @@ insert_item_to_db(struct diritem *di)
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
 		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
 
-	//sqlite3_exec(db, zSQL, 0, 0, 0);
-
 	sqlite3_step(stmt);
 
 	if (q)
@@ -152,7 +152,20 @@ insert_item_to_db(struct diritem *di)
 }
 
 void
-db_update_visit_count(const char *s)
+db_update_visit_count(const char *table, const char *dirname)
 {
+	int		 rc;
+	char		*q;
+	sqlite3_stmt	*stmt;
+
+	q = sqlite3_mprintf("UPDATE %q SET visits %q WHERE dir LIKE '%q';", table, NEXTNUMBERHERE, dirname);
+	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
+		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
+
+	sqlite3_step(stmt);
+
+	if (q)
+		sqlite3_free(q);
+	sqlite3_finalize(stmt);
 }
 
