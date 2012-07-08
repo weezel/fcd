@@ -4,6 +4,8 @@
 #include <sys/dirent.h>
 #include <sys/param.h>
 
+#include <menu.h>
+
 struct dlist {				/* directory list */
 	char	abspath[MAXPATHLEN];	/* directory path */
 	char	dname[MAXNAMLEN];	/* directory name */

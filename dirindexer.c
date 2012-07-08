@@ -21,11 +21,10 @@
 #include "extern.h"
 #include "dbutils.h"
 
-#define DEBUG
-
 struct diritem *alloc_diritem(const char *);
 void free_diritem(struct diritem *);
 int walk_directory(const char *);
+int isdirapplicable(const char *);
 int dirlist(const char *, const struct stat *, int);
 
 

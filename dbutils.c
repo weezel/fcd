@@ -22,24 +22,45 @@ db_init(void)
 	dbisopen = 1;
 }
 
-void
-db_get_choice_by_id(const long long choice)
+struct resultset
+db_get_choice_by_id(const char *table, const long long id)
 {
 	int		 rc;
+	char		*q;
 	sqlite3_stmt	*stmt;
+	struct resultset rs;
 
-	if ((rc = sqlite3_prepare_v2(db, "SELECT path, dir FROM homedir WHERE id = ?;", -1, &stmt, NULL)))
+	memset(&rs, 0, sizeof(struct resultset));
+
+	q = sqlite3_mprintf("SELECT id, path, dir, visits, bookmark FROM %q WHERE id = ?;", table);
+
+	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
 		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
 
-	sqlite3_bind_int64(stmt, 1, choice);
+	sqlite3_bind_int64(stmt, 1, id);
 
-	if (sqlite3_step(stmt) == SQLITE_ROW)
-		fprintf(stdout, "%s%s\n", sqlite3_column_text(stmt, 0),
-			sqlite3_column_text(stmt, 1));
+	while (sqlite3_step(stmt) == SQLITE_ROW) {
+		size_t	 path_len = 0;
+		size_t	 dir_len  = 0;
+		char	*pathname = sqlite3_column_text(stmt, 1);
+		char	*dirname  = sqlite3_column_text(stmt, 2);
+
+		path_len = strlen(pathname) + 1;
+		dir_len  = strlen(dirname)  + 1;
+
+		strlcpy(rs.path, pathname, (path_len > MAXPATHLEN) ? MAXPATHLEN : path_len);
+		strlcpy(rs.dir,  dirname,  (dir_len  > MAXNAMLEN)  ? MAXNAMLEN  : dir_len);
+		rs.id = sqlite3_column_int64(stmt, 0);
+		rs.visits = sqlite3_column_int64(stmt, 3);
+		rs.bookmark = sqlite3_column_int64(stmt, 4);
+	}
 
 	sqlite3_finalize(stmt);
+
+	return rs;
 }
 
+/* Any use for this function? */
 size_t
 db_match_count(const char *dirname)
 {
@@ -116,9 +137,11 @@ db_find_exact(const char *table, const char *dirname)
 
 	fprintf(stdout, "ID%-5sPATH%-39sDIRECTORY%-12sVISITS%-2sBOOKMARKED\n", "", "", "", "");
 	while (sqlite3_step(stmt) == SQLITE_ROW) {
+		#ifndef DEBUG
 		fprintf(stdout, "%-6llu %-42s %-20s %-7llu %llu\n", sqlite3_column_int64(stmt, 0),
 			sqlite3_column_text(stmt, 1), sqlite3_column_text(stmt, 2),
 			sqlite3_column_int64(stmt, 3), sqlite3_column_int64(stmt, 4));
+		#endif
 		hits++;
 	}
 
@@ -152,13 +175,13 @@ insert_item_to_db(struct diritem *di)
 }
 
 void
-db_update_visit_count(const char *table, const char *dirname)
+db_update_visit_count(const char *table, const char *dirname, struct resultset *rs)
 {
 	int		 rc;
 	char		*q;
 	sqlite3_stmt	*stmt;
 
-	q = sqlite3_mprintf("UPDATE %q SET visits %q WHERE dir LIKE '%q';", table, NEXTNUMBERHERE, dirname);
+	q = sqlite3_mprintf("UPDATE %q SET visits %q WHERE dir LIKE '%q';", table, ++rs->visits, dirname);
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
 		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
 

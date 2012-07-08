@@ -15,12 +15,14 @@
 
 int validate_name(const char *);
 int changedir(const char *);
+void interactive(void);
 void usage(void);
 
 int
 main(int argc, const char *argv[])
 {
-	int		 lflag, ch;
+	int		 lflag, iflag, ch;
+	size_t		 choice = 0;
 	long long	 hits;
 	const char	*dirname;
 
@@ -29,12 +31,15 @@ main(int argc, const char *argv[])
 	if (argc < 2)
 		usage();
 
-	while ((ch = getopt(argc, (char *const *)argv, "bd")) != -1) {
-		switch ((char)ch) {
+	while ((ch = getopt(argc, (char *const *)argv, "bdi")) != -1) {
+		switch ((char) ch) {
 		case 'b': /* Bookmark */
 			lflag = 1;
 			break;
 		case 'd': /* Max word difference */
+			break;
+		case 'i': /* Interactive */
+			iflag = 1;
 			break;
 		default: /* No extra options */
 			usage();
@@ -46,6 +51,8 @@ main(int argc, const char *argv[])
 	argv += optind;
 
 	process_query(dirname);
+	if (iflag)
+		interactive(&choice);
 
 	/*
 	db = db_open(DB_NAME);
@@ -72,6 +79,15 @@ validate_name(const char *str)
 	}
 
 	return 0;
+}
+
+void
+interactive(size_t *choice)
+{
+	do {
+		fpurge(stdin);
+		fprintf(stdout, "Choice > ");
+	} while (!scanf("%d", &choice));
 }
 
 void

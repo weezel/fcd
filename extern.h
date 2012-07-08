@@ -7,6 +7,8 @@
 #define MAX_HITS 256
 #define MAX_CHOICESIZE (MAXPATHLEN + MAXNAMLEN)
 
+#define DEBUG
+
 #define TABLE_HOME "homedir"
 #define TABLE_USR  "usrdir"
 #define TABLE_ETC  "etcdir"

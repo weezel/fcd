@@ -1,6 +1,8 @@
 #ifndef _CHOOSER_H_
 #define _CHOOSER_H_
 
+#include <menu.h>
+
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 
 void show_chooser_win(MENU *, size_t, char *);

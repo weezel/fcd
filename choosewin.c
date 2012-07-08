@@ -101,6 +101,7 @@ free_menu_and_items(MENU *m)
 	free_menu(m);
 }
 
+/*
 int
 main(int argc, const char *argv[])
 {
@@ -133,3 +134,5 @@ main(int argc, const char *argv[])
 
 	return 0;
 }
+*/
+
