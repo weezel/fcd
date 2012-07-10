@@ -14,15 +14,7 @@
 
 #define LINEBUFFER 1024
 
-int min(const int, const int);
 size_t levenstein_distance(const char *, const size_t, const char *, const size_t);
-
-
-int
-min(const int a, const int b)
-{
-	return a <= b ? a : b;
-}
 
 size_t
 levenstein_distance(const char *s1, const size_t s1len, const char *s2, const size_t s2len)
@@ -50,7 +42,7 @@ levenstein_distance(const char *s1, const size_t s1len, const char *s2, const si
 		for (j = 1; j <= s2len; j++) {
 			cost = (s1[i-1] == s2[j-1]) ?  0 : 1;
 
-			sumofall = min(min(resultable[i-1][j] + 1,		/* deletion */
+			sumofall = MIN(MIN(resultable[i-1][j] + 1,		/* deletion */
 					   resultable[i][j-1] + 1),		/* insertion */
 					   resultable[i-1][j-1] + cost);	/* substitution */
 
