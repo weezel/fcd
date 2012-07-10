@@ -26,10 +26,6 @@ those can be easily accessed.
 	[½] Separate databases for `/usr/`, `/home/`, and `/var/` and custom
 	directory
 
-	[½] Favourites / Frequently visited / Tags
-
-	[½] Spellcheck
-
 	[ ] Use file descriptors to pass data around?
 
 	[ ] Support for configuration file?
@@ -37,6 +33,10 @@ those can be easily accessed.
 	[ ] Write SIGWINCH handler
 
 ## DONE:
+	[X] Favourites / Frequently visited / Tags
+
+	[X] Spellcheck
+
 	[X] Implement directory walk
 
 	[X] Implement getopt functionality
