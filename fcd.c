@@ -38,7 +38,7 @@ main(int argc, const char *argv[])
 	diff = choice = hits = 0;
 	memset(&rs, 0, sizeof(struct resultset));
 
-	if (argc < 2)
+	if (argc < 3)
 		usage();
 
 	while ((ch = getopt(argc, (char *const *)argv, "abcd:i")) != -1) {
@@ -120,7 +120,7 @@ usage(void)
 {
 	extern char *__progname;
 
-	(void)fprintf(stderr, "usage: %s [-b] [-d] [name]\n", __progname);
+	(void)fprintf(stderr, "usage: %s [-b] [-d] directory name\n", __progname);
 	exit(1);
 }
 
