@@ -13,6 +13,8 @@
 #define TABLE_USR  "usrdir"
 #define TABLE_ETC  "etcdir"
 
+enum table_column { BOOKMARK, VISIT } tc;
+
 struct diritem {
 	char	path[MAXPATHLEN];
 	char	dname[MAXNAMLEN];

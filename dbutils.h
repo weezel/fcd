@@ -21,11 +21,14 @@ int		 dbisopen; // is  > 0 if opened
 sqlite3		*db;
 
 void db_init(void);
+void db_close(void);
 struct resultset db_get_choice_by_id(const char *, const long long);
-size_t db_match_count(const char *);
-size_t db_show_matched(const char *);
+size_t db_match_count(const char *, const char *);
+size_t db_find_spellchecked(const char *, const char *, const size_t);
 size_t db_find_exact(const char *, const char *);
 void insert_item_to_db(struct diritem *);
-void db_update_visit_count(const char *, const char *, struct resultset *);
+int db_update(const char *, struct resultset *, const size_t column);
+void print_resultset(struct resultset *);
 
 #endif /* _DBUTILS_H_ */
+

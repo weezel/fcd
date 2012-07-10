@@ -38,8 +38,11 @@ those can be easily accessed.
 
 ## DONE:
 	[X] Implement directory walk
+
 	[X] Implement getopt functionality
+
 	[X] Implement basic functionality
+
 	[X] Show current item number / total items / (MAX_ITEMS)
 
 ## FUTURE IMPROVEMENTS

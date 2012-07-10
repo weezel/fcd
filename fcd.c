@@ -15,33 +15,54 @@
 
 int validate_name(const char *);
 int changedir(const char *);
-void interactive(void);
+void interactive(long long *);
 void usage(void);
+
+int aflag; /* Ask for the choice */
+int bflag; /* Bookmark */
+int cflag; /* Use curses */
+int dflag; /* Maximum word difference in spellcheck */
+int iflag; /* Case insensitive search */
 
 int
 main(int argc, const char *argv[])
 {
-	int		 lflag, iflag, ch;
-	size_t		 choice = 0;
+	int		 ch;
+	size_t		 diff;
+	long long	 choice;
 	long long	 hits;
+	struct resultset rs;
 	const char	*dirname;
+	const char	*errstr;
 
-	hits = lflag = 0;
+	diff = choice = hits = 0;
+	memset(&rs, 0, sizeof(struct resultset));
 
 	if (argc < 2)
 		usage();
 
-	while ((ch = getopt(argc, (char *const *)argv, "bdi")) != -1) {
+	while ((ch = getopt(argc, (char *const *)argv, "abcd:i")) != -1) {
 		switch ((char) ch) {
-		case 'b': /* Bookmark */
-			lflag = 1;
+		case 'a':
+			aflag = 1;
 			break;
-		case 'd': /* Max word difference */
+		case 'b':
+			bflag = 1;
 			break;
-		case 'i': /* Interactive */
+		case 'c':
+			cflag = 1;
+			break;
+		case 'd':
+			dflag = 1;
+			diff = strtonum(optarg, 0, 1000, &errstr);
+			if (errstr)
+				errx(1, "You fool, %s is not a NUMBER we want! Error: %s",
+				     optarg, errstr);
+			break;
+		case 'i':
 			iflag = 1;
 			break;
-		default: /* No extra options */
+		default:
 			usage();
 		}
 	}
@@ -50,22 +71,25 @@ main(int argc, const char *argv[])
 	argc -= optind;
 	argv += optind;
 
-	process_query(dirname);
-	if (iflag)
+	db_init();
+
+	if (cflag)
+		process_query(dirname);
+	else if (dflag) {
+		db_find_spellchecked(TABLE_HOME, dirname, diff);
+	}
+	if (aflag) {
+		db_find_exact(TABLE_HOME, dirname);
 		interactive(&choice);
+		rs = db_get_choice_by_id(TABLE_HOME, choice);
+		print_resultset(&rs);
+	}
 
-	/*
-	db = db_open(DB_NAME);
-	hits = db_show_matched(db, dirname);
-
-	sqlite3_close(db);
-	sqlite3_free(db);
-	*/
+	db_close();
 
 	return 0;
 }
 
-/* if str is valid, return 0, else -1 */
 int
 validate_name(const char *str)
 {
@@ -82,12 +106,13 @@ validate_name(const char *str)
 }
 
 void
-interactive(size_t *choice)
+interactive(long long *choice)
 {
+	fprintf(stdout, "\n");
 	do {
 		fpurge(stdin);
 		fprintf(stdout, "Choice > ");
-	} while (!scanf("%d", &choice));
+	} while (!scanf("%lld", choice));
 }
 
 void

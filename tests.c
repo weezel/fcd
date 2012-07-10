@@ -6,7 +6,7 @@
 void test_walk_directory(void);
 void test_db_find_exact_match(void);
 void test_db_get_choice_by_id(void);
-int walk_directory(const char *);
+extern int walk_directory(const char *);
 
 
 void

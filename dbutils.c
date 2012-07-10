@@ -9,6 +9,10 @@
 #include "extern.h"
 #include "dbutils.h"
 
+extern size_t levenstein_distance(const char *, const size_t,
+				  const char *, const size_t);
+
+
 void
 db_init(void)
 {
@@ -20,6 +24,15 @@ db_init(void)
 		exit(5);
 	}
 	dbisopen = 1;
+}
+
+void
+db_close(void)
+{
+	if (db) {
+		sqlite3_close(db);
+		sqlite3_free(db);
+	}
 }
 
 struct resultset
@@ -34,16 +47,18 @@ db_get_choice_by_id(const char *table, const long long id)
 
 	q = sqlite3_mprintf("SELECT id, path, dir, visits, bookmark FROM %q WHERE id = ?;", table);
 
-	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
+	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL))) {
 		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
+		goto sqlerror;
+	}
 
 	sqlite3_bind_int64(stmt, 1, id);
 
 	while (sqlite3_step(stmt) == SQLITE_ROW) {
 		size_t	 path_len = 0;
 		size_t	 dir_len  = 0;
-		char	*pathname = sqlite3_column_text(stmt, 1);
-		char	*dirname  = sqlite3_column_text(stmt, 2);
+		char	*pathname = (char *) sqlite3_column_text(stmt, 1);
+		char	*dirname  = (char *) sqlite3_column_text(stmt, 2);
 
 		path_len = strlen(pathname) + 1;
 		dir_len  = strlen(dirname)  + 1;
@@ -55,6 +70,9 @@ db_get_choice_by_id(const char *table, const long long id)
 		rs.bookmark = sqlite3_column_int64(stmt, 4);
 	}
 
+sqlerror:
+	if (q)
+		sqlite3_free(q);
 	sqlite3_finalize(stmt);
 
 	return rs;
@@ -62,7 +80,7 @@ db_get_choice_by_id(const char *table, const long long id)
 
 /* Any use for this function? */
 size_t
-db_match_count(const char *dirname)
+db_match_count(const char *table, const char *dirname)
 {
 	int		 rc;
 	size_t		 hits;
@@ -71,13 +89,16 @@ db_match_count(const char *dirname)
 
 	hits = 0;
 
-	q = sqlite3_mprintf("SELECT COUNT(dir) FROM homedir WHERE dir LIKE '%%%q%%';", dirname);
-	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
+	q = sqlite3_mprintf("SELECT COUNT(dir) FROM %q WHERE dir LIKE '%%%q%%';", table, dirname);
+	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL))) {
 		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
+		goto error;
+	}
 
 	sqlite3_step(stmt);
 	hits = (size_t) sqlite3_column_int64(stmt, 0);
 
+error:
 	if (q)
 		sqlite3_free(q);
 	sqlite3_finalize(stmt);
@@ -86,7 +107,7 @@ db_match_count(const char *dirname)
 }
 
 size_t
-db_show_matched(const char *name)
+db_find_spellchecked(const char *table, const char *dirname, const size_t diff)
 {
 	int		 rc;
 	size_t		 hits;
@@ -95,25 +116,22 @@ db_show_matched(const char *name)
 
 	hits = 0;
 
-	q = sqlite3_mprintf("SELECT id, path, dir FROM homedir WHERE dir LIKE '%%%q%%';", name);
-	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
+	q = sqlite3_mprintf("SELECT id, path, dir FROM %q", table);
+	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL))) {
 		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
-
-	while (sqlite3_step(stmt) == SQLITE_ROW) {
-		fprintf(stdout, "%llu%-5s%s  %s\n", sqlite3_column_int64(stmt, 0), "",
-			sqlite3_column_text(stmt, 1), sqlite3_column_text(stmt, 2));
-		/*
-		*singlematch = sqlite3_column_int64(stmt, 0);
-		XXX
-		if (dflag > 0) {
-			size_t difference = spellcheck(word1, sqlite3_columnt, dflag);
-			if (difference < dlfag)
-				hits++;
-		}
-		*/
-		hits++;
+		goto error;
 	}
 
+	while (sqlite3_step(stmt) == SQLITE_ROW) {
+		const char *tablerow = (const char *) sqlite3_column_text(stmt, 2);
+
+		if (levenstein_distance(dirname, (size_t) strlen(dirname),
+				       tablerow, (size_t) strlen(tablerow)) <= diff)
+			fprintf(stdout, "%llu%-5s%s  %s\n", sqlite3_column_int64(stmt, 0), "",
+				sqlite3_column_text(stmt, 1), sqlite3_column_text(stmt, 2));
+	}
+
+error:
 	if (q)
 		sqlite3_free(q);
 	sqlite3_finalize(stmt);
@@ -131,17 +149,15 @@ db_find_exact(const char *table, const char *dirname)
 
 	hits = 0;
 
-	q = sqlite3_mprintf("SELECT * FROM %q WHERE dir LIKE '%q';", table, dirname);
+	q = sqlite3_mprintf("SELECT * FROM %q WHERE dir LIKE '%q%%';", table, dirname);
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
 		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
 
 	fprintf(stdout, "ID%-5sPATH%-39sDIRECTORY%-12sVISITS%-2sBOOKMARKED\n", "", "", "", "");
 	while (sqlite3_step(stmt) == SQLITE_ROW) {
-		#ifndef DEBUG
 		fprintf(stdout, "%-6llu %-42s %-20s %-7llu %llu\n", sqlite3_column_int64(stmt, 0),
 			sqlite3_column_text(stmt, 1), sqlite3_column_text(stmt, 2),
 			sqlite3_column_int64(stmt, 3), sqlite3_column_int64(stmt, 4));
-		#endif
 		hits++;
 	}
 
@@ -174,21 +190,43 @@ insert_item_to_db(struct diritem *di)
 	sqlite3_finalize(stmt);
 }
 
-void
-db_update_visit_count(const char *table, const char *dirname, struct resultset *rs)
+int
+db_update(const char *table, struct resultset *rs, const size_t column)
 {
+	int		 rtrnval = -1;
 	int		 rc;
 	char		*q;
 	sqlite3_stmt	*stmt;
 
-	q = sqlite3_mprintf("UPDATE %q SET visits %q WHERE dir LIKE '%q';", table, ++rs->visits, dirname);
+	switch (column) {
+	case BOOKMARK:
+		rs->bookmark ^= 1;
+		q = sqlite3_mprintf("UPDATE %q SET bookmark %q WHERE dir LIKE '%q';", table, rs->bookmark);
+		break;
+	case VISIT:
+		q = sqlite3_mprintf("UPDATE %q SET visits %q WHERE dir LIKE '%q';", table, ++rs->visits);
+		break;
+	default:
+		fprintf(stderr, "You brought some dirty garbage! %lu ain't no good value.\n", column);
+		return rtrnval;
+	}
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
 		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
 
-	sqlite3_step(stmt);
+	rtrnval = sqlite3_step(stmt);
 
 	if (q)
 		sqlite3_free(q);
 	sqlite3_finalize(stmt);
+
+	return rtrnval;
+}
+
+void
+print_resultset(struct resultset *rs)
+{
+	fprintf(stdout, "\n%-49s ", rs->path);
+	fprintf(stdout, "<< %s >> ", rs->dir);
+	fprintf(stdout, "[%zu, %zu, %d]\n", rs->id, rs->visits, rs->bookmark);
 }
 

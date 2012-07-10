@@ -11,8 +11,9 @@ CURSESFLAGS=-L/usr/lib -lmenu -lcurses
 .PHONY: all clean
 
 #all: choosewin dbutils
-all: dbutils choosewin controller
-	${CC} ${CFLAGS} ${CURSESFLAGS} ${SQLITEFLAGS} dbutils.o choosewin.o controller.o fcd.c -o fcd
+all: spellcheckers dbutils choosewin controller
+	${CC} ${CFLAGS} ${CURSESFLAGS} ${SQLITEFLAGS} spellcheckers.o dbutils.o \
+		choosewin.o controller.o fcd.c -o fcd
 dbutils:
 	#${CC} ${CFLAGS} dbutils.c tests.c -o dbutils_test
 	${CC} ${CFLAGS} dbutils.c -c -o dbutils.o
@@ -24,6 +25,8 @@ choosewin:
 	${CC} ${CFLAGS} -c -o choosewin.o choosewin.c
 dirindexer: dbutils
 	${CC} ${CFLAGS} dbutils.o dirindexer.c -c -o dirindexer.o
+spellcheckers:
+	${CC} ${CFLAGS} spellcheck.c -c -o spellcheckers.o
 tests: dbutils dirindexer
 	${CC} ${CFLAGS} ${SQLITEFLAGS} dbutils.o dirindexer.o tests.c -o all_tests
 clean:
