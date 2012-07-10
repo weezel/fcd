@@ -40,8 +40,6 @@ process_query(const char *dirname)
 	char		  choice[MAX_CHOICESIZE];
 	MENU		 *choices = NULL;
 
-	if (dbisopen < 1)
-		db_init();
 	found = db_match_count(TABLE_HOME, dirname);
 	if (found > MAX_HITS) {
 		found = MAX_HITS;
@@ -57,9 +55,6 @@ process_query(const char *dirname)
 	free_menu_and_items(choices);
 	free_dlist();
 	endwin();
-
-	sqlite3_close(db);
-	sqlite3_free(db);
 
 	fprintf(stdout, "%s\n", choice);
 }

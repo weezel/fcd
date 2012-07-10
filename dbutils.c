@@ -89,7 +89,7 @@ db_match_count(const char *table, const char *dirname)
 
 	hits = 0;
 
-	q = sqlite3_mprintf("SELECT COUNT(dir) FROM %q WHERE dir LIKE '%%%q%%';", table, dirname);
+	q = sqlite3_mprintf("SELECT COUNT(dir) FROM %q WHERE dir LIKE '%q%%';", table, dirname);
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL))) {
 		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
 		goto error;

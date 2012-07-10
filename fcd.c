@@ -54,7 +54,7 @@ main(int argc, const char *argv[])
 			break;
 		case 'd':
 			dflag = 1;
-			diff = strtonum(optarg, 0, 1000, &errstr);
+			diff = strtonum(optarg, 0, MAX_HITS, &errstr);
 			if (errstr)
 				errx(1, "You fool, %s is not a NUMBER we want! Error: %s",
 				     optarg, errstr);
