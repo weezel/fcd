@@ -2,10 +2,11 @@
 #include <err.h>
 #include <getopt.h>
 #include <limits.h>
-#include <unistd.h>
+#include <sys/param.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #if defined __linux__
 #define u_char unsigned char
