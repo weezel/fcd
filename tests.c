@@ -3,9 +3,9 @@
 
 #include <stdio.h>
 
-void test_walk_directory(void);
-void test_db_find_exact_match(void);
-void test_db_get_choice_by_id(void);
+void	test_walk_directory(void);
+void	test_db_find_exact_match(void);
+void	test_db_get_choice_by_id(void);
 extern int walk_directory(const char *);
 
 

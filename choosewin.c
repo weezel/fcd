@@ -60,11 +60,6 @@ show_chooser_win(MENU *dirmenu, size_t items, char *buf)
 				goto toolong;
 
 			pos_menu_cursor(dirmenu);
-			/* XXX Some attention needed around these lines
-			mvprintw(20, 0, "Item selected is : %s",
-			    item_name(current_item(paths)));
-			pos_menu_cursor(paths);
-			*/
 			break;
 		}
 	}
@@ -100,39 +95,4 @@ free_menu_and_items(MENU *m)
 		free_item(items[i]);
 	free_menu(m);
 }
-
-/*
-int
-main(int argc, const char *argv[])
-{
-	int		  i = 0;
-	int		  n = 200;
-	ITEM		**myitems;
-	MENU		 *mymenu;
-
-	myitems = calloc(n + 1, sizeof(ITEM *));
-	for (i = 0; i < n; i++) {
-		char *choice;
-		char *choice2;
-
-		choice = calloc(256, sizeof(char));
-		choice2 = calloc(256, sizeof(char));
-
-		sprintf(choice, "Item %d", i+1);
-		sprintf(choice2, "hii %d", (i % 5));
-		myitems[i] = new_item(choice, choice2);
-	}
-	myitems[n] = (ITEM *) NULL;
-
-	mymenu = new_menu((ITEM **) myitems);
-
-	init_screen();
-	show_chooser_win(mymenu, 5, "Item 1");
-
-	free_menu_and_items(mymenu);
-	endwin();
-
-	return 0;
-}
-*/
 

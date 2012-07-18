@@ -22,10 +22,10 @@
 #include "dbutils.h"
 
 struct diritem *alloc_diritem(const char *);
-void free_diritem(struct diritem *);
-int walk_directory(const char *);
-int isdirapplicable(const char *);
-int dirlist(const char *, const struct stat *, int);
+void	free_diritem(struct diritem *);
+int	walk_directory(const char *);
+int	isdirapplicable(const char *);
+int	dirlist(const char *, const struct stat *, int);
 
 
 struct diritem *
@@ -123,7 +123,7 @@ dirlist(const char *name, const struct stat *st, int type)
 				err(1, "Failed to alloc memory for %s", name);
 
 			fprintf(stdout, "[ %s ]%1s %-30s %s\n", "OK", "", di->dname, di->path);
-			insert_item_to_db(di);
+			db_insert_diritem(di);
 			free_diritem(di);
 			directories_added++;
 		}

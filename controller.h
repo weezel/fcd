@@ -17,7 +17,7 @@ struct dlist	*dirlist;
 
 void alloc_dlist(size_t);
 void free_dlist(void);
-void process_query(const char *);
+void process_query(const char *, const int);
 MENU *combine_items(const char *, size_t);
 
 #endif

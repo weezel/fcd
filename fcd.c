@@ -13,16 +13,20 @@
 #include "choosewin.h"
 #include "controller.h"
 
-int validate_name(const char *);
-int changedir(const char *);
-void interactive(long long *);
-void usage(void);
+void	execute(char *);
+int	validate_name(const char *);
+int	changedir(const char *);
+void	interactive(long long *);
+void	usage(void);
 
-int aflag; /* Ask for the choice */
-int bflag; /* Bookmark */
-int cflag; /* Use curses */
-int dflag; /* Maximum word difference in spellcheck */
-int iflag; /* Case insensitive search */
+int	aflag; /* Ask for the choice, cannot be combined with 'c' flag */
+int	bflag; /* Bookmark */
+int	cflag; /* Use curses, cannot be combined with 'a' flag */
+int	dflag; /* Maximum word difference in spellcheck */
+int	Dflag; /* Remove directory item */
+int	iflag; /* Case insensitive search */
+int	Iflag; /* Insert new directory item */
+int	tflag; /* Search for table {ETC, HOME, USR} */
 
 int
 main(int argc, const char *argv[])
@@ -32,16 +36,18 @@ main(int argc, const char *argv[])
 	long long	 choice;
 	long long	 hits;
 	struct resultset rs;
+	char		 fullpath[MAX_CHOICESIZE];
 	const char	*dirname;
 	const char	*errstr;
 
 	diff = choice = hits = 0;
 	memset(&rs, 0, sizeof(struct resultset));
+	memset(fullpath, 0, MAX_CHOICESIZE);
 
-	if (argc < 3)
+	if (argc < 2)
 		usage();
 
-	while ((ch = getopt(argc, (char *const *)argv, "abcd:i")) != -1) {
+	while ((ch = getopt(argc, (char *const *)argv, "abcd:DiIt:")) != -1) {
 		switch ((char) ch) {
 		case 'a':
 			aflag = 1;
@@ -59,8 +65,17 @@ main(int argc, const char *argv[])
 				errx(1, "You fool, %s is not a NUMBER we want! Error: %s",
 				     optarg, errstr);
 			break;
+		case 'D':
+			Dflag = 1;
+			break;
 		case 'i':
 			iflag = 1;
+			break;
+		case 'I':
+			Iflag = 1;
+			break;
+		case 't':
+			tflag = 1;
 			break;
 		default:
 			usage();
@@ -74,35 +89,58 @@ main(int argc, const char *argv[])
 	db_init();
 
 	if (cflag)
-		process_query(dirname);
-	else if (dflag) {
-		db_find_spellchecked(TABLE_HOME, dirname, diff);
-	}
-	if (aflag) {
-		db_find_exact(TABLE_HOME, dirname);
+		process_query(dirname, dflag);
+	else if (Iflag || Dflag) {
+		int	 rv = 0;
+		char	*cwd = NULL;
+
+		if ((cwd = getenv("PWD")) == NULL) {
+			warn("Error while retrieving the current path");
+			goto error;
+		}
+		snprintf(cwd, strlen(cwd) + 2, "%s/", cwd);
+
+		if (Iflag && !Dflag) {
+			if ((rv = db_insert_dir(TABLE_HOME, cwd, dirname)) != 0) {
+				err(1, "Cannot remove directory %s%s from db", cwd, dirname);
+				goto error;
+			}
+		} else if (Dflag) {
+			if ((rv = db_delete_dir(TABLE_HOME, cwd, dirname)) == 0) {
+				err(1, "Cannot remove directory %s%s from db", cwd, dirname);
+				goto error;
+			}
+		}
+	} else if (aflag) {
+		if (dflag)
+			db_find_spellchecked(TABLE_HOME, dirname, diff);
+		else
+			db_find_exact(TABLE_HOME, dirname);
 		interactive(&choice);
 		rs = db_get_choice_by_id(TABLE_HOME, choice);
 		print_resultset(&rs);
-	}
+	} else if (dflag)
+		db_find_spellchecked(TABLE_HOME, dirname, diff);
+	else
+		db_find_exact(TABLE_HOME, dirname);
+	snprintf(fullpath, MAX_CHOICESIZE - 1, "%s%s", rs.path, rs.dir);
+	fullpath[MAX_CHOICESIZE - 1] = '\0';
 
+error:
+	/* Rather close now if we drive to some problem on the next clause */
 	db_close();
 
-	return 0;
+	execute(fullpath);
+
+	return EXIT_SUCCESS;
 }
 
-int
-validate_name(const char *str)
+void
+execute(char *dirname)
 {
-	char	*cp = '\0';
+	char	*argv[] = {"sh", "-c", "cd", dirname, NULL};
 
-	cp = (char *)&str[0];
-	while (*cp != '\0') {
-		if (isalnum(*cp) == 0)
-			return -1;
-		cp++;
-	}
-
-	return 0;
+	execv("/bin/sh", argv);
 }
 
 void
@@ -120,7 +158,7 @@ usage(void)
 {
 	extern char *__progname;
 
-	(void)fprintf(stderr, "usage: %s [-b] [-d] directory name\n", __progname);
+	(void)fprintf(stderr, "usage: %s [-abcdDiIt] directory name\n", __progname);
 	exit(1);
 }
 

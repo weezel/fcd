@@ -23,6 +23,4 @@ struct diritem {
 long int	directories_added;
 long int	directories_total;
 
-int dflag;	/* Maximum difference between words for spellcheck */
-
 #endif

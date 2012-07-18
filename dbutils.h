@@ -20,15 +20,17 @@ struct resultset {
 int		 dbisopen; // is  > 0 if opened
 sqlite3		*db;
 
-void db_init(void);
-void db_close(void);
+void	db_init(void);
+void	db_close(void);
 struct resultset db_get_choice_by_id(const char *, const long long);
-size_t db_match_count(const char *, const char *);
-size_t db_find_spellchecked(const char *, const char *, const size_t);
-size_t db_find_exact(const char *, const char *);
-void insert_item_to_db(struct diritem *);
-int db_update(const char *, struct resultset *, const size_t column);
-void print_resultset(struct resultset *);
+size_t	db_match_count(const char *, const char *);
+size_t	db_find_spellchecked(const char *, const char *, const size_t);
+size_t	db_find_exact(const char *, const char *);
+int	db_insert_diritem(const char *, struct diritem *);
+int	db_update(const char *, struct resultset *, const size_t);
+int	db_insert_dir(const char *, const char *, const char *);
+int	db_delete_dir(const char *, const char *, const char *);
+void	print_resultset(struct resultset *);
 
 #endif /* _DBUTILS_H_ */
 

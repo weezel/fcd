@@ -23,16 +23,17 @@ those can be easily accessed.
 
 
 ## TODO
-	[½] Separate databases for `/usr/`, `/home/`, and `/var/` and custom
-	directory
-
-	[ ] Use file descriptors to pass data around?
-
-	[ ] Support for configuration file?
-
 	[ ] Write SIGWINCH handler
 
+
 ## DONE:
+	[X] Implement basic functionality
+
+	[X] Separate databases for `/usr/`, `/home/`, and `/var/` and custom
+	directory
+
+	[X] Functions to handle add/remove of a dir
+
 	[X] Favourites / Frequently visited / Tags
 
 	[X] Spellcheck
@@ -41,7 +42,6 @@ those can be easily accessed.
 
 	[X] Implement getopt functionality
 
-	[X] Implement basic functionality
 
 	[X] Show current item number / total items / (MAX_ITEMS)
 
@@ -49,4 +49,8 @@ those can be easily accessed.
 Things I might consider at some point.
 
 	[ ] UTF8 support
+
+	[ ] Support for configuration file?
+
+	[ ] Use file descriptors to pass data around?
 

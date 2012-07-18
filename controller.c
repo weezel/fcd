@@ -14,7 +14,6 @@
 #include "extern.h"
 #include "choosewin.h"
 #include "dbutils.h"
-
 #include "controller.h"
 
 
@@ -34,7 +33,7 @@ free_dlist(void)
 
 
 void
-process_query(const char *dirname)
+process_query(const char *dirname, const int dflag)
 {
 	size_t		  found;
 	char		  choice[MAX_CHOICESIZE];

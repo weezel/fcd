@@ -12,13 +12,21 @@
 extern size_t levenstein_distance(const char *, const size_t,
 				  const char *, const size_t);
 
-
 void
 db_init(void)
 {
-	int	rc;
+	int	 rc;
+	int	 rv;
+	char	*db_path;
+	char	*db_name;
 
-	if ((rc = sqlite3_open(DB_NAME, &db)) != 0) {
+	db_path = DB_PATH;
+	db_name = DB_NAME;
+
+	if ((rv = chdir(db_path)) != 0)
+		err(1, "Cannot change directory to: %s", DB_PATH);
+
+	if ((rc = sqlite3_open(db_name, &db)) != 0) {
 		err(1, "Cannot open database %s", sqlite3_errmsg(db));
 		sqlite3_close(db);
 		exit(5);
@@ -122,13 +130,23 @@ db_find_spellchecked(const char *table, const char *dirname, const size_t diff)
 		goto error;
 	}
 
+	fprintf(stdout, "ID%-5sPATH%-39sDIRECTORY%-12s(DIFF, VISITS, BOOKMARKED)\n",
+		"", "", "");
 	while (sqlite3_step(stmt) == SQLITE_ROW) {
 		const char *tablerow = (const char *) sqlite3_column_text(stmt, 2);
+		size_t wdiff = levenstein_distance(dirname,
+						   (size_t) strlen(dirname),
+						   tablerow,
+						   (size_t) strlen(tablerow));
 
-		if (levenstein_distance(dirname, (size_t) strlen(dirname),
-				       tablerow, (size_t) strlen(tablerow)) <= diff)
-			fprintf(stdout, "%llu%-5s%s  %s\n", sqlite3_column_int64(stmt, 0), "",
-				sqlite3_column_text(stmt, 1), sqlite3_column_text(stmt, 2));
+		if (wdiff <= diff)
+			fprintf(stdout, "%-6llu %s   %s (%zu, %llu, %llu)\n",
+				sqlite3_column_int64(stmt, 0),
+				sqlite3_column_text(stmt, 1),
+				sqlite3_column_text(stmt, 2),
+				wdiff,
+				sqlite3_column_int64(stmt, 3),
+				sqlite3_column_int64(stmt, 4));
 	}
 
 error:
@@ -168,26 +186,26 @@ db_find_exact(const char *table, const char *dirname)
 	return hits;
 }
 
-void
-insert_item_to_db(struct diritem *di)
+int
+db_insert_diritem(const char *table, struct diritem *di)
 {
 	int		 rc;
 	char		*q;
 	sqlite3_stmt	*stmt;
 
-	q = sqlite3_mprintf("INSERT INTO homedir(path, dir, visits, bookmark) VALUES('%q', '%q', %q, %q);",
-			    di->path, di->dname, 0, 0);
-	#ifdef DEBUG
-	fprintf(stdout, "SQL-SYNTAX: %s\n", q);
-	#endif
+	q = sqlite3_mprintf("INSERT INTO %q(path, dir, visits, bookmark) VALUES('%q', '%q', %q, %q);",
+			    table, di->path, di->dname, 0, 0);
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
 		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
 
-	sqlite3_step(stmt);
+	if ((rc = sqlite3_step(stmt)) != SQLITE_OK)
+		fprintf(stderr, "Error while adding to db: %s\n", sqlite3_errmsg(db));
 
 	if (q)
 		sqlite3_free(q);
 	sqlite3_finalize(stmt);
+
+	return rc;
 }
 
 int
@@ -220,6 +238,56 @@ db_update(const char *table, struct resultset *rs, const size_t column)
 	sqlite3_finalize(stmt);
 
 	return rtrnval;
+}
+
+int
+db_insert_dir(const char *table, const char *path, const char *dirname)
+{
+	int		 rc = 0;
+	char		*q;
+	sqlite3_stmt	*stmt;
+
+	q = sqlite3_mprintf("INSERT INTO %q(path, dir, visits, bookmark) VALUES('%q', '%q', %q, %q);",
+			    table, path, dirname, 0, 0);
+	fprintf(stdout, "SQL: %s\n", q);
+	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
+		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
+
+	if ((rc = sqlite3_step(stmt)) != SQLITE_OK) {
+		fprintf(stderr, "Error in insert: %s\n", sqlite3_errmsg(db));
+		rc = -1;
+	}
+
+	if (q)
+		sqlite3_free(q);
+	sqlite3_finalize(stmt);
+
+	return rc;
+}
+
+int
+db_delete_dir(const char *table, const char *path, const char *dirname)
+{
+	int		 rm_count = 0;
+	int		 rc = 0;
+	char		*q;
+	sqlite3_stmt	*stmt;
+
+	q = sqlite3_mprintf("DELETE FROM %q WHERE path LIKE '%q' AND dir LIKE '%q';",
+			    table, path, dirname);
+	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
+		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
+
+	while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+		fprintf(stdout, "Deleting: %s/%s\n", path, dirname);
+		rm_count++;
+	}
+
+	if (q)
+		sqlite3_free(q);
+	sqlite3_finalize(stmt);
+
+	return rm_count;
 }
 
 void

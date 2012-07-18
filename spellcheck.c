@@ -1,8 +1,9 @@
+#include <sys/param.h>
+
 #include <ctype.h>
 #include <err.h>
 #include <getopt.h>
 #include <limits.h>
-#include <sys/param.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,7 +16,7 @@
 
 #define LINEBUFFER 1024
 
-size_t levenstein_distance(const char *, const size_t, const char *, const size_t);
+size_t	levenstein_distance(const char *, const size_t, const char *, const size_t);
 
 size_t
 levenstein_distance(const char *s1, const size_t s1len, const char *s2, const size_t s2len)
@@ -34,7 +35,7 @@ levenstein_distance(const char *s1, const size_t s1len, const char *s2, const si
 			err(10, "malloc");
 	}
 
-	for (i = 0; i <= s1len; i++)
+	for (i = 0; i <= s1len; i++) /* replace  with macro */
 		resultable[i][0] = i;
 	for (j = 0; j <= s2len; j++)
 		resultable[0][j] = j;
