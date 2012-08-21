@@ -21,12 +21,17 @@ those can be easily accessed.
 # Logic behind the program
 --Unfinished--
 
+# Usage
+Find directory that has `test` in its name. Since there can be many search
+results we will like to choose which one was intended:
 
-## TODO
+`fcd -a test`
+
+
+### TODO
 	[ ] Write SIGWINCH handler
 
-
-## DONE:
+### DONE:
 	[X] Implement basic functionality
 
 	[X] Separate databases for `/usr/`, `/home/`, and `/var/` and custom
@@ -42,10 +47,9 @@ those can be easily accessed.
 
 	[X] Implement getopt functionality
 
-
 	[X] Show current item number / total items / (MAX_ITEMS)
 
-## FUTURE IMPROVEMENTS
+### FUTURE IMPROVEMENTS
 Things I might consider at some point.
 
 	[ ] UTF8 support

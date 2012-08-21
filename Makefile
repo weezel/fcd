@@ -1,12 +1,12 @@
 CC=clang
-#CFLAGS=-pedantic -Wall -Wextra -std=c99 -g
-CFLAGS+= -g -Wall -Wextra -pedantic -std=c99
+CFLAGS+= -std=c99 -g -Wall -Wextra -pedantic
 CFLAGS+= -Wstrict-prototypes -Wmissing-prototypes
-CFLAGS+= -Wmissing-declarations
-CFLAGS+= -Wshadow -Wpointer-arith -Wcast-qual
-CFLAGS+= -Wsign-compare
+CFLAGS+= -Wmissing-declarations -Wshadow
+CFLAGS+= -Wpointer-arith -Wcast-qual
+CFLAGS+= -Wsign-compare -Wdeclaration-after-statement
 SQLITEFLAGS=-I /usr/local/include -L /usr/local/lib -lsqlite3
 CURSESFLAGS=-L/usr/lib -lmenu -lcurses
+FILES=choosewin.c  controller.c  dbutils.c  dirindexer.c  fcd.c  spellcheck.c  tests.c
 
 .PHONY: all clean
 
@@ -28,6 +28,11 @@ tests: dbutils dirindexer
 	#${CC} ${CFLAGS} ${CURSESFLAGS} ${SQLITEFLAGS} controller.c dbutils.c choosewin.c -o controller_test
 	#${CC} ${CFLAGS} ${CURSESFLAGS} choosewin.c -c -o choosewin_test
 	${CC} ${CFLAGS} ${SQLITEFLAGS} dbutils.o dirindexer.o tests.c -o all_tests
+scanbuild:
+	scan-build -analyze-headers -o result_html -v -enable-checker debug.DumpCallGraph make
+lint:
+	lint -c -e -h -f -I /usr/local/include ${FILES}
+
 clean:
 	rm -rf *.o *.core fcd *_test all_tests
 

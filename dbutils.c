@@ -27,9 +27,9 @@ db_init(void)
 		err(1, "Cannot change directory to: %s", DB_PATH);
 
 	if ((rc = sqlite3_open(db_name, &db)) != 0) {
+		if (db)
+			sqlite3_close(db);
 		err(1, "Cannot open database %s", sqlite3_errmsg(db));
-		sqlite3_close(db);
-		exit(5);
 	}
 	dbisopen = 1;
 }
@@ -86,7 +86,7 @@ sqlerror:
 	return rs;
 }
 
-/* Any use for this function? */
+/* XXX Any use for this function? */
 size_t
 db_match_count(const char *table, const char *dirname)
 {
@@ -193,13 +193,16 @@ db_insert_diritem(const char *table, struct diritem *di)
 	char		*q;
 	sqlite3_stmt	*stmt;
 
-	q = sqlite3_mprintf("INSERT INTO %q(path, dir, visits, bookmark) VALUES('%q', '%q', %q, %q);",
+	q = sqlite3_mprintf("INSERT INTO %q(path, dir, visits, bookmark) "
+			    "VALUES('%q', '%q', %q, %q);",
 			    table, di->path, di->dname, 0, 0);
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
-		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
+		fprintf(stderr, "Error while preparing %s\n",
+			sqlite3_errmsg(db));
 
 	if ((rc = sqlite3_step(stmt)) != SQLITE_OK)
-		fprintf(stderr, "Error while adding to db: %s\n", sqlite3_errmsg(db));
+		fprintf(stderr, "Error while adding to db: %s\n",
+			sqlite3_errmsg(db));
 
 	if (q)
 		sqlite3_free(q);
@@ -219,17 +222,23 @@ db_update(const char *table, struct resultset *rs, const size_t column)
 	switch (column) {
 	case BOOKMARK:
 		rs->bookmark ^= 1;
-		q = sqlite3_mprintf("UPDATE %q SET bookmark %q WHERE dir LIKE '%q';", table, rs->bookmark);
+		q = sqlite3_mprintf("UPDATE %q SET bookmark %q "
+				    "WHERE dir LIKE '%q';",
+				    table, rs->bookmark);
 		break;
 	case VISIT:
-		q = sqlite3_mprintf("UPDATE %q SET visits %q WHERE dir LIKE '%q';", table, ++rs->visits);
+		q = sqlite3_mprintf("UPDATE %q SET visits %q "
+				    "WHERE dir LIKE '%q';",
+				    table, ++rs->visits);
 		break;
 	default:
-		fprintf(stderr, "You brought some dirty garbage! %lu ain't no good value.\n", column);
+		fprintf(stderr, "You brought some dirty garbage! "
+				"%lu ain't good value.\n", column);
 		return rtrnval;
 	}
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
-		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
+		fprintf(stderr, "Error while preparing %s\n",
+			sqlite3_errmsg(db));
 
 	rtrnval = sqlite3_step(stmt);
 
@@ -247,14 +256,17 @@ db_insert_dir(const char *table, const char *path, const char *dirname)
 	char		*q;
 	sqlite3_stmt	*stmt;
 
-	q = sqlite3_mprintf("INSERT INTO %q(path, dir, visits, bookmark) VALUES('%q', '%q', %q, %q);",
+	q = sqlite3_mprintf("INSERT INTO %q(path, dir, visits, bookmark) "
+			    "VALUES('%q', '%q', %q, %q);",
 			    table, path, dirname, 0, 0);
 	fprintf(stdout, "SQL: %s\n", q);
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
-		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
+		fprintf(stderr, "Error while preparing %s\n",
+			sqlite3_errmsg(db));
 
 	if ((rc = sqlite3_step(stmt)) != SQLITE_OK) {
-		fprintf(stderr, "Error in insert: %s\n", sqlite3_errmsg(db));
+		fprintf(stderr, "Error in insert: %s\n",
+			sqlite3_errmsg(db));
 		rc = -1;
 	}
 
@@ -273,10 +285,11 @@ db_delete_dir(const char *table, const char *path, const char *dirname)
 	char		*q;
 	sqlite3_stmt	*stmt;
 
-	q = sqlite3_mprintf("DELETE FROM %q WHERE path LIKE '%q' AND dir LIKE '%q';",
-			    table, path, dirname);
+	q = sqlite3_mprintf("DELETE FROM %q WHERE path LIKE '%q' AND "
+			    "dir LIKE '%q';", table, path, dirname);
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
-		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
+		fprintf(stderr, "Error while preparing %s\n",
+			sqlite3_errmsg(db));
 
 	while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
 		fprintf(stdout, "Deleting: %s/%s\n", path, dirname);
