@@ -96,16 +96,24 @@ main(int argc, const char *argv[])
 		process_query(dirname, dflag);
 	else if (Iflag || Dflag) {
 		int	 rv = 0;
-		char	*cwd = NULL;
+		size_t	 len = 0;
+		char	cwd[PATH_MAX];
 
-		if ((cwd = getenv("PWD")) == NULL) {
-			warn("Error while retrieving the current path");
+		memset(&cwd, 0, PATH_MAX);
+		if ((getcwd(cwd, sizeof(cwd))) == NULL) {
+			err(5, "Error while retrieving the current path");
 			goto error;
 		}
-		snprintf(cwd, strlen(cwd) + 2, "%s/", cwd);
+		len = strlen(cwd) + 2;
+		if (len < PATH_MAX)
+			snprintf(cwd, len, "%s/", cwd);
+		else {
+			fprintf(stderr, "path too long\n");
+			goto error;
+		}
 
 		if (Iflag && !Dflag) {
-			if ((rv = db_insert_dir(TABLE_HOME, cwd, dirname)) != 0) {
+			if ((rv = db_insert_dir(TABLE_HOME, cwd, dirname)) != SQLITE_DONE) {
 				err(1, "Cannot insert directory %s%s to db",
 					cwd, dirname);
 				goto error;

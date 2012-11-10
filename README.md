@@ -31,6 +31,10 @@ results we will like to choose which one was intended:
 ### TODO
 	[ ] Write SIGWINCH handler
 
+	[ ] Replace %q -> %Q
+
+	[ ] Open as readonly when reading
+
 ### DONE:
 	[X] Implement basic functionality
 

@@ -86,9 +86,8 @@ sqlerror:
 	return rs;
 }
 
-/* XXX Any use for this function? */
 size_t
-db_match_count(const char *table, const char *dirname)
+db_match_count(const char *table, const char *path, const char *dirname)
 {
 	int		 rc;
 	size_t		 hits;
@@ -97,7 +96,10 @@ db_match_count(const char *table, const char *dirname)
 
 	hits = 0;
 
-	q = sqlite3_mprintf("SELECT COUNT(dir) FROM %q WHERE dir LIKE '%q%%';", table, dirname);
+	if (path == NULL)
+		q = sqlite3_mprintf("SELECT COUNT(dir) FROM %q WHERE dir LIKE '%q%%';", table, dirname);
+	else
+		q = sqlite3_mprintf("SELECT COUNT(dir) FROM %q WHERE path LIKE '%q%%' AND dir LIKE '%q%%';", table, path, dirname);
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL))) {
 		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
 		goto error;
@@ -253,8 +255,13 @@ int
 db_insert_dir(const char *table, const char *path, const char *dirname)
 {
 	int		 rc = 0;
+	size_t		 prevmatches = 0;
 	char		*q;
 	sqlite3_stmt	*stmt;
+
+	prevmatches = db_match_count(TABLE_HOME, path, dirname);
+	if (prevmatches > 0)
+		fprintf(stdout, "DB already contains %s%s: %zu\n", path, dirname, prevmatches);
 
 	q = sqlite3_mprintf("INSERT INTO %q(path, dir, visits, bookmark) "
 			    "VALUES('%q', '%q', %q, %q);",
@@ -264,7 +271,9 @@ db_insert_dir(const char *table, const char *path, const char *dirname)
 		fprintf(stderr, "Error while preparing %s\n",
 			sqlite3_errmsg(db));
 
-	if ((rc = sqlite3_step(stmt)) != SQLITE_OK) {
+	rc = 0;
+	if ((rc = sqlite3_step(stmt)) != SQLITE_DONE) {
+		fprintf(stdout, "RC WAS: %d\n", rc);
 		fprintf(stderr, "Error in insert: %s\n",
 			sqlite3_errmsg(db));
 		rc = -1;

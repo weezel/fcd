@@ -39,7 +39,7 @@ process_query(const char *dirname, const int dflag)
 	char		  choice[MAX_CHOICESIZE];
 	MENU		 *choices = NULL;
 
-	found = db_match_count(TABLE_HOME, dirname);
+	found = db_match_count(TABLE_HOME, NULL, dirname);
 	if (found > MAX_HITS) {
 		found = MAX_HITS;
 		hit_max_items = 1;
