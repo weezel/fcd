@@ -43,7 +43,7 @@ Open as readonly when reading
 
 ~~Favourites / Frequently visited / Tags~~
 
-~~Spellcheck ~~ (needs improvements though)
+~~Spellcheck~~ (needs improvements though)
 
 ~~Implement directory walk~~
 
