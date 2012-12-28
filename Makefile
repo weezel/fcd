@@ -5,14 +5,24 @@ CFLAGS+= -Wstrict-prototypes -Wmissing-prototypes
 CFLAGS+= -Wmissing-declarations
 CFLAGS+= -Wshadow -Wpointer-arith -Wcast-qual
 CFLAGS+= -Wsign-compare
-SQLITEFLAGS=-I /usr/local/include -L /usr/local/lib -lsqlite3
+SQLITEFLAGS=-L /usr/local/lib -lsqlite3
 CURSESFLAGS=-L/usr/lib -lmenu -lcurses
+OS=$(shell uname)
+
+ifeq ($(OS), Linux)
+	CFLAGS += -I /usr/local/include/linux -I /usr/lib/gcc/x86_64-linux-gnu/4.6/include-fixed 
+	CURSESFLAGS+=-lbsd
+endif
+
+ifeq ($(OS), OpenBSD)
+	CFLAGS += -I /usr/local/include
+endif
 
 .PHONY: all clean
 
 all: spellcheckers dbutils choosewin controller
-	${CC} ${CFLAGS} ${CURSESFLAGS} ${SQLITEFLAGS} spellcheckers.o dbutils.o \
-		choosewin.o controller.o fcd.c -o fcd
+	${CC} ${CFLAGS} spellcheckers.o dbutils.o \
+		choosewin.o controller.o fcd.c -o fcd ${CURSESFLAGS} ${SQLITEFLAGS}
 dbutils:
 	${CC} ${CFLAGS} dbutils.c -c -o dbutils.o
 controller:

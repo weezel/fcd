@@ -7,7 +7,12 @@
  */
 
 #include <sys/types.h>
+#if defined __OpenBSD__
 #include <sys/dirent.h>
+#endif
+#if defined __linux__
+#include <dirent.h>
+#endif
 #include <sys/param.h>
 
 #include <err.h>

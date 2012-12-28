@@ -1,11 +1,29 @@
 #include <sqlite3.h>
 
+#if defined __OpenBSD__
+#include <sys/syslimits.h>
+#endif
+#if defined __linux__
+#include <sys/types.h>
+#ifndef __u_char_defined
+typedef __u_char u_char;
+typedef __u_short u_short;
+typedef __u_int u_int;
+typedef __u_long u_long;
+typedef __quad_t quad_t;
+typedef __u_quad_t u_quad_t;
+typedef __fsid_t fsid_t;
+# define __u_char_defined
+#endif
+#include <getopt.h>
+#include <bsd/stdlib.h>
+#endif
+
 #include <ctype.h>
 #include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/syslimits.h>
 #include <unistd.h>
 
 #include "extern.h"
