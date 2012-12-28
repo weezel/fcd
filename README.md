@@ -35,21 +35,21 @@ Replace %q -> %Q
 
 Open as readonly when reading
 
-~~Implement basic functionality~~
+* ~~Implement basic functionality~~
 
-~~Separate databases for `/usr/`, `/home/`, and `/var/` and custom directory~~
+* ~~Separate databases for `/usr/`, `/home/`, and `/var/` and custom directory~~
 
-~~Functions to handle add/remove of a dir~~
+* ~~Functions to handle add/remove of a dir~~
 
-~~Favourites / Frequently visited / Tags~~
+* ~~Favourites / Frequently visited / Tags~~
 
-~~Spellcheck~~ (needs improvements though)
+* ~~Spellcheck~~ (needs improvements though)
 
-~~Implement directory walk~~
+* ~~Implement directory walk~~
 
-~~Implement getopt functionality~~
+* ~~Implement getopt functionality~~
 
-~~Show current item number / total items / (MAX_ITEMS)~~
+* ~~Show current item number / total items / (MAX_ITEMS)~~
 
 ### FUTURE IMPROVEMENTS
 Things I might consider at some point.
