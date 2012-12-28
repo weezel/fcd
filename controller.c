@@ -39,7 +39,7 @@ process_query(const char *dirname, const int dflag)
 	char		  choice[MAX_CHOICESIZE];
 	MENU		 *choices = NULL;
 
-	found = db_match_count(TABLE_HOME, dirname);
+	found = db_match_count(TABLE_HOME, NULL, dirname);
 	if (found > MAX_HITS) {
 		found = MAX_HITS;
 		hit_max_items = 1;
@@ -78,9 +78,11 @@ combine_items(const char *dirname, size_t item_count)
 
 	q = sqlite3_mprintf("SELECT path, dir FROM homedir WHERE dir LIKE '%%%q%%';", dirname);
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
-		fprintf(stderr, "Error while preparing %s\n", sqlite3_errmsg(db));
+		fprintf(stderr, "Error while preparing %s\n",
+			sqlite3_errmsg(db));
 
-	for (hits = 0; hits < item_count && sqlite3_step(stmt) == SQLITE_ROW;) {
+	for (hits = 0; hits < item_count && sqlite3_step(stmt) ==
+					    SQLITE_ROW;) {
 		char	*pathtmp;
 		char	*dnametmp;
 
@@ -89,7 +91,8 @@ combine_items(const char *dirname, size_t item_count)
 		strlcpy(dirlist[hits].abspath, pathtmp, MAXPATHLEN);
 		strlcpy(dirlist[hits].dname, dnametmp, MAXNAMLEN);
 		if ((pathtmp != NULL) && (dnametmp != NULL)) {
-			items[hits] = new_item(dirlist[hits].abspath, dirlist[hits].dname);
+			items[hits] = new_item(dirlist[hits].abspath,
+					       dirlist[hits].dname);
 		}
 		hits++;
 	}

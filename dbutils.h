@@ -31,7 +31,7 @@ sqlite3		*db;
 void	db_init(void);
 void	db_close(void);
 struct resultset db_get_choice_by_id(const char *, const long long);
-size_t	db_match_count(const char *, const char *);
+size_t	db_match_count(const char *, const char *, const char *);
 size_t	db_find_spellchecked(const char *, const char *, const size_t);
 size_t	db_find_exact(const char *, const char *);
 int	db_insert_diritem(const char *, struct diritem *);

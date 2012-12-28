@@ -1,6 +1,5 @@
 CC=clang
-#CFLAGS=-pedantic -Wall -Wextra -std=c99 -g
-CFLAGS+= -g -Wall -Wextra -pedantic -std=c99
+CFLAGS+= -std=c99 -g -Wall -Wextra -pedantic
 CFLAGS+= -Wstrict-prototypes -Wmissing-prototypes
 CFLAGS+= -Wmissing-declarations
 CFLAGS+= -Wshadow -Wpointer-arith -Wcast-qual
@@ -10,7 +9,7 @@ CURSESFLAGS=-L/usr/lib -lmenu -lcurses
 OS=$(shell uname)
 
 ifeq ($(OS), Linux)
-	CFLAGS += -I /usr/local/include/linux -I /usr/lib/gcc/x86_64-linux-gnu/4.6/include-fixed 
+	CFLAGS += -I /usr/local/include/linux
 	CURSESFLAGS+=-lbsd
 endif
 
@@ -38,6 +37,11 @@ tests: dbutils dirindexer
 	#${CC} ${CFLAGS} ${CURSESFLAGS} ${SQLITEFLAGS} controller.c dbutils.c choosewin.c -o controller_test
 	#${CC} ${CFLAGS} ${CURSESFLAGS} choosewin.c -c -o choosewin_test
 	${CC} ${CFLAGS} ${SQLITEFLAGS} dbutils.o dirindexer.o tests.c -o all_tests
+scanbuild:
+	scan-build -analyze-headers -o result_html -v -enable-checker debug.DumpCallGraph make
+lint:
+	lint -c -e -h -f -I /usr/local/include ${FILES}
+
 clean:
 	rm -rf *.o *.core fcd *_test all_tests
 

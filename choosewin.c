@@ -55,7 +55,8 @@ show_chooser_win(MENU *dirmenu, size_t items, char *buf)
 			offset = strlcpy(buf, tmp, MAX_CHOICESIZE);
 			if (offset >= MAX_CHOICESIZE)
 				goto toolong;
-			if (strlcpy(buf + offset, item_description(current_item(dirmenu)),
+			if (strlcpy(buf + offset,
+				    item_description(current_item(dirmenu)),
 				    MAX_CHOICESIZE - offset))
 				goto toolong;
 

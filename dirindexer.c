@@ -120,6 +120,7 @@ dirlist(const char *name, const struct stat *st, int type)
 	switch (type) {
 	case FTW_NS: /* Symbolic link or another non stat'able object */
 		fstatus = -1;
+		break;
 	case FTW_D:
 		if (isdirapplicable(name) == 0) {
 			struct diritem *di;

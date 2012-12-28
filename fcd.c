@@ -66,28 +66,32 @@ main(int argc, const char *argv[])
 		switch ((char) ch) {
 		case 'a':
 			aflag = 1;
+			cflag = 0;
 			break;
 		case 'b':
 			bflag = 1;
 			break;
 		case 'c':
 			cflag = 1;
+			aflag = 0;
 			break;
 		case 'd':
 			dflag = 1;
 			diff = strtonum(optarg, 0, MAX_HITS, &errstr);
 			if (errstr)
-				errx(1, "You fool, %s is not a NUMBER we want! Error: %s",
-				     optarg, errstr);
+				errx(1, "You fool, %s is not a NUMBER we "
+					"want! Error: %s", optarg, errstr);
 			break;
 		case 'D':
 			Dflag = 1;
+			Iflag = 0;
 			break;
 		case 'i':
 			iflag = 1;
 			break;
 		case 'I':
 			Iflag = 1;
+			Dflag = 0;
 			break;
 		case 't':
 			tflag = 1;
@@ -107,22 +111,32 @@ main(int argc, const char *argv[])
 		process_query(dirname, dflag);
 	else if (Iflag || Dflag) {
 		int	 rv = 0;
-		char	*cwd = NULL;
+		size_t	 len = 0;
+		char	cwd[PATH_MAX];
 
-		if ((cwd = getenv("PWD")) == NULL) {
-			warn("Error while retrieving the current path");
+		memset(&cwd, 0, PATH_MAX);
+		if ((getcwd(cwd, sizeof(cwd))) == NULL) {
+			err(5, "Error while retrieving the current path");
 			goto error;
 		}
-		snprintf(cwd, strlen(cwd) + 2, "%s/", cwd);
+		len = strlen(cwd) + 2;
+		if (len < PATH_MAX)
+			snprintf(cwd, len, "%s/", cwd);
+		else {
+			fprintf(stderr, "path too long\n");
+			goto error;
+		}
 
 		if (Iflag && !Dflag) {
-			if ((rv = db_insert_dir(TABLE_HOME, cwd, dirname)) != 0) {
-				err(1, "Cannot remove directory %s%s from db", cwd, dirname);
+			if ((rv = db_insert_dir(TABLE_HOME, cwd, dirname)) != SQLITE_DONE) {
+				err(1, "Cannot insert directory %s%s to db",
+					cwd, dirname);
 				goto error;
 			}
 		} else if (Dflag) {
 			if ((rv = db_delete_dir(TABLE_HOME, cwd, dirname)) == 0) {
-				err(1, "Cannot remove directory %s%s from db", cwd, dirname);
+				err(1, "Cannot remove directory %s%s from db",
+					cwd, dirname);
 				goto error;
 			}
 		}
@@ -173,7 +187,8 @@ usage(void)
 {
 	extern char *__progname;
 
-	(void)fprintf(stderr, "usage: %s [-abcdDiIt] directory name\n", __progname);
+	(void)fprintf(stderr, "usage: %s [-abcdDiIt] directory name\n",
+		      __progname);
 	exit(1);
 }
 

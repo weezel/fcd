@@ -10,3 +10,4 @@ testi.c
 *.core
 *_test
 all_tests
+result_html
