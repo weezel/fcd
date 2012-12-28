@@ -6,13 +6,10 @@
 #if defined __linux__
 #include <sys/types.h>
 #ifndef __u_char_defined
-typedef __u_char u_char;
-typedef __u_short u_short;
-typedef __u_int u_int;
-typedef __u_long u_long;
-typedef __quad_t quad_t;
-typedef __u_quad_t u_quad_t;
-typedef __fsid_t fsid_t;
+typedef __u_char	u_char;
+typedef __u_short	u_short;
+typedef __u_int		u_int;
+typedef __u_long	u_long;
 # define __u_char_defined
 #endif
 #include <getopt.h>
