@@ -1,7 +1,14 @@
 #ifndef _EXTERN_H_
 #define _EXTERN_H_
 
+#if defined __OpenBSD__
 #include <sys/dirent.h>
+#else
+#if !defined(MAXNAMLEN)
+#define MAXNAMLEN NAME_MAX
+#endif
+#endif
+
 #include <sys/param.h>
 
 #define MAX_HITS 256

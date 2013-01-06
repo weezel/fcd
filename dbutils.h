@@ -1,7 +1,15 @@
 #ifndef _DBUTILS_H_
 #define _DBUTILS_H_
 
+/*
+#if defined __OpenBSD__
+#include <sys/dirent.h>
+#else
+#include <dirent.h>
+#endif
+*/
 #include <sqlite3.h>
+
 #include <stdlib.h>
 
 #include "extern.h"

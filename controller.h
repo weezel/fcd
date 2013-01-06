@@ -1,7 +1,14 @@
 #ifndef _CONTROLLER_H_
 #define _CONTROLLER_H_
 
+#if defined __OpenBSD__
 #include <sys/dirent.h>
+#endif
+#if defined __linux__
+#include <limits.h>
+#include <dirent.h>
+#include <bsd/string.h>
+#endif
 #include <sys/param.h>
 
 #include <menu.h>

@@ -6,6 +6,10 @@
 #include <string.h>
 #include <unistd.h>
 
+#if defined __linux__
+#include <bsd/string.h>
+#endif
+
 #include "extern.h"
 #include "dbutils.h"
 
@@ -72,7 +76,7 @@ db_get_choice_by_id(const char *table, const long long id)
 		dir_len  = strlen(dirname)  + 1;
 
 		strlcpy(rs.path, pathname, (path_len > MAXPATHLEN) ? MAXPATHLEN : path_len);
-		strlcpy(rs.dir,  dirname,  (dir_len  > MAXNAMLEN)  ? MAXNAMLEN  : dir_len);
+		strlcpy(rs.dir,  dirname,  (dir_len  > NAME_MAX)  ? NAME_MAX : dir_len);
 		rs.id = sqlite3_column_int64(stmt, 0);
 		rs.visits = sqlite3_column_int64(stmt, 3);
 		rs.bookmark = sqlite3_column_int64(stmt, 4);

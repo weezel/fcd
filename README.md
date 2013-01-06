@@ -29,36 +29,34 @@ results we will like to choose which one was intended:
 
 
 ### TODO
-	[ ] Write SIGWINCH handler
+Write SIGWINCH handler
 
-	[ ] Replace %q -> %Q
+Replace %q -> %Q
 
-	[ ] Open as readonly when reading
+Open as readonly when reading
 
-### DONE:
-	[X] Implement basic functionality
+* ~~Implement basic functionality~~
 
-	[X] Separate databases for `/usr/`, `/home/`, and `/var/` and custom
-	directory
+* ~~Separate databases for `/usr/`, `/home/`, and `/var/` and custom directory~~
 
-	[X] Functions to handle add/remove of a dir
+* ~~Functions to handle add/remove of a dir~~
 
-	[X] Favourites / Frequently visited / Tags
+* ~~Favourites / Frequently visited / Tags~~
 
-	[X] Spellcheck
+* ~~Spellcheck~~ (needs improvements though)
 
-	[X] Implement directory walk
+* ~~Implement directory walk~~
 
-	[X] Implement getopt functionality
+* ~~Implement getopt functionality~~
 
-	[X] Show current item number / total items / (MAX_ITEMS)
+* ~~Show current item number / total items / (MAX_ITEMS)~~
 
 ### FUTURE IMPROVEMENTS
 Things I might consider at some point.
 
-	[ ] UTF8 support
+* UTF8 support
 
-	[ ] Support for configuration file?
+* Support for configuration file?
 
-	[ ] Use file descriptors to pass data around?
+* Use file descriptors to pass data around?
 
