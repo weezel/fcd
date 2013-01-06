@@ -29,11 +29,11 @@ results we will like to choose which one was intended:
 
 
 ### TODO
-Write SIGWINCH handler
+* Write SIGWINCH handler
 
-Replace %q -> %Q
+* Replace %q -> %Q
 
-Open as readonly when reading
+* Open as readonly when reading
 
 * ~~Implement basic functionality~~
 
