@@ -128,16 +128,19 @@ main(int argc, const char *argv[])
 		}
 
 		if (Iflag && !Dflag) {
-			if ((rv = db_insert_dir(TABLE_HOME, cwd, dirname)) != SQLITE_DONE) {
+			if ((rv = db_insert_dir(TABLE_HOME, cwd, dirname))
+								!= SQLITE_DONE) {
 				if (rv == SQLITE_CONSTRAINT)
-					fprintf(stderr, "DB already contains %s%s\n", cwd, dirname);
+					fprintf(stderr, "DB already contains %s%s\n",
+						cwd, dirname);
 				else
 					err(1, "Cannot insert directory %s%s to db",
 						cwd, dirname);
 				goto error;
 			}
 		} else if (Dflag) {
-			if ((rv = db_delete_dir(TABLE_HOME, cwd, dirname)) != SQLITE_OK) {
+			if ((rv = db_delete_dir(TABLE_HOME, cwd, dirname))
+								!= SQLITE_DONE) {
 				err(1, "Cannot remove directory %s%s from db",
 					cwd, dirname);
 				goto error;
