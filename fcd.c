@@ -157,17 +157,9 @@ error:
 	/* Rather close now if we drive to some problem on the next clause */
 	db_close();
 
-	execute(fullpath);
+	printf("%s\n", fullpath);
 
 	return EXIT_SUCCESS;
-}
-
-void
-execute(char *dirname)
-{
-	char	*argv[] = {"sh", "-c", "cd", dirname, NULL};
-
-	execv("/bin/sh", argv);
 }
 
 void
