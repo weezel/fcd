@@ -185,15 +185,22 @@ db_find_exact(const char *table, const char *dirname)
 		fprintf(stderr, "Error preparing %s\n",
 		    __func__, sqlite3_errmsg(db));
 
-	fprintf(stdout, "ID%-5sPATH%-39sDIRECTORY%-12sVISITS%-2sBOOKMARKED\n",
-		"", "", "", "");
+	if (vflag)
+		fprintf(stdout, "ID%-5sPATH%-39sDIRECTORY%-12sVISITS%-2sBOOKMARKED\n",
+		    "", "", "", "");
 	while (sqlite3_step(stmt) == SQLITE_ROW) {
-		fprintf(stdout, "%-6llu %-42s %-20s %-7llu %llu\n",
-			sqlite3_column_int64(stmt, 0),
-			sqlite3_column_text(stmt, 1),
-			sqlite3_column_text(stmt, 2),
-			sqlite3_column_int64(stmt, 3),
-			sqlite3_column_int64(stmt, 4));
+		if (vflag) {
+			fprintf(stdout, "%-6llu %-42s %-20s %-7llu %llu\n",
+			    sqlite3_column_int64(stmt, 0),
+			    sqlite3_column_text(stmt, 1),
+			    sqlite3_column_text(stmt, 2),
+			    sqlite3_column_int64(stmt, 3),
+			    sqlite3_column_int64(stmt, 4));
+		} else {
+			fprintf(stdout, "%s%s\n",
+			    sqlite3_column_text(stmt, 1),
+			    sqlite3_column_text(stmt, 2));
+		}
 		hits++;
 	}
 
@@ -307,7 +314,6 @@ db_update(const char *table, struct resultset *rs, const size_t column)
 int
 db_delete_dir(const char *table, const char *path, const char *dirname)
 {
-	/* XXX Elaborate error message */
 	int		 rc = 0;
 	char		*q;
 	sqlite3_stmt	*stmt = NULL;

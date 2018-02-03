@@ -54,7 +54,7 @@ main(int argc, const char *argv[])
 	if (argc < 2)
 		usage();
 
-	while ((ch = getopt(argc, (char *const *)argv, "abcd:DiIt:")) != -1) {
+	while ((ch = getopt(argc, (char *const *)argv, "abcd:DiIt:v")) != -1) {
 		switch ((char) ch) {
 		case 'a':
 			aflag = 1;
@@ -87,6 +87,9 @@ main(int argc, const char *argv[])
 			break;
 		case 't':
 			tflag = 1;
+			break;
+		case 'v':
+			vflag = 1;
 			break;
 		default:
 			usage();
