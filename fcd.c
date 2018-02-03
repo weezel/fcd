@@ -153,14 +153,13 @@ main(int argc, const char *argv[])
 		db_find_spellchecked(TABLE_HOME, dirname, diff);
 	else
 		db_find_exact(TABLE_HOME, dirname);
-	snprintf(fullpath, MAX_CHOICESIZE - 1, "%s%s", rs.path, rs.dir);
-	fullpath[MAX_CHOICESIZE - 1] = '\0';
+//	snprintf(fullpath, MAX_CHOICESIZE - 1, "%s%s", rs.path, rs.dir);
+//	fullpath[MAX_CHOICESIZE - 1] = '\0';
 
 error:
-	/* Rather close now if we drive to some problem on the next clause */
 	db_close();
 
-	printf("%s\n", fullpath);
+//	printf("%s\n", fullpath);
 
 	return EXIT_SUCCESS;
 }

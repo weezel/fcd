@@ -180,7 +180,8 @@ db_find_exact(const char *table, const char *dirname)
 
 	hits = 0;
 
-	q = sqlite3_mprintf("SELECT * FROM %q WHERE dir LIKE '%q%%';", table, dirname);
+	q = sqlite3_mprintf("SELECT * FROM %q WHERE dir LIKE '%q%%';",
+		    table, dirname);
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
 		fprintf(stderr, "Error preparing %s\n",
 		    __func__, sqlite3_errmsg(db));
