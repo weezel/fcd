@@ -28,12 +28,14 @@ db_init(void)
 	db_name = DB_NAME;
 
 	if ((rv = chdir(db_path)) != 0)
-		err(1, "Cannot change directory to: %s", DB_PATH);
+		err(1, "(%s) Cannot change directory to: %s",
+		    __func__, DB_PATH);
 
 	if ((rc = sqlite3_open(db_name, &db)) != 0) {
 		if (db)
 			sqlite3_close(db);
-		err(1, "Cannot open database %s", sqlite3_errmsg(db));
+		err(1, "(%s) Cannot open database %s",
+		    __func__, sqlite3_errmsg(db));
 	}
 	dbisopen = 1;
 }
@@ -60,7 +62,8 @@ db_get_choice_by_id(const char *table, const long long id)
 	q = sqlite3_mprintf("SELECT id, path, dir, visits, bookmark FROM %q WHERE id = ?;", table);
 
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL))) {
-		fprintf(stderr, "Error in function db_get_choice_by_id() while preparing %s\n", sqlite3_errmsg(db));
+		fprintf(stderr, "(%s) Error preparing %s\n",
+		    __func__, sqlite3_errmsg(db));
 		goto sqlerror;
 	}
 
@@ -105,7 +108,8 @@ db_match_count(const char *table, const char *path, const char *dirname)
 	else
 		q = sqlite3_mprintf("SELECT COUNT(dir) FROM %q WHERE path LIKE '%q%%' AND dir LIKE '%q%%';", table, path, dirname);
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL))) {
-		fprintf(stderr, "Error in function db_match_count() while preparing: %s\n", sqlite3_errmsg(db));
+		fprintf(stderr, "(%s) Error preparing: %s\n",
+		    __func__, sqlite3_errmsg(db));
 		goto error;
 	}
 
@@ -132,7 +136,8 @@ db_find_spellchecked(const char *table, const char *dirname, const size_t diff)
 
 	q = sqlite3_mprintf("SELECT id, path, dir FROM %q", table);
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL))) {
-		fprintf(stderr, "Error in function db_find_spellchecked() while preparing %s\n", sqlite3_errmsg(db));
+		fprintf(stderr, "(%s) Error preparing %s\n",
+		    __func__, sqlite3_errmsg(db));
 		goto error;
 	}
 
@@ -175,8 +180,8 @@ db_find_exact(const char *table, const char *dirname)
 
 	q = sqlite3_mprintf("SELECT * FROM %q WHERE dir LIKE '%q%%';", table, dirname);
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
-		fprintf(stderr, "Error in function db_find_exact() while preparing %s\n",
-			sqlite3_errmsg(db));
+		fprintf(stderr, "Error preparing %s\n",
+		    __func__, sqlite3_errmsg(db));
 
 	fprintf(stdout, "ID%-5sPATH%-39sDIRECTORY%-12sVISITS%-2sBOOKMARKED\n",
 		"", "", "", "");
@@ -208,8 +213,8 @@ db_insert_diritem(const char *table, struct diritem *di)
 			    "VALUES('%q', '%q', %q, %q);",
 			    table, di->path, di->dname, 0, 0);
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)) != SQLITE_OK) {
-		fprintf(stderr, "DB already contains %s%s\n",
-			di->path, di->dname);
+		fprintf(stderr, "(%s) DB already contains %s%s\n",
+		    __func__, di->path, di->dname);
 		rc = SQLITE_CONSTRAINT;
 		goto error;
 	}
@@ -243,8 +248,8 @@ db_insert_dir(const char *table, const char *path, const char *dirname)
 			    "VALUES(%Q, %Q, %Q, %Q);",
 			    table, path, dirname, 0, 0);
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)) != SQLITE_OK) {
-		fprintf(stderr, "Error in function db_insert_dir() while preparing %s\n",
-			sqlite3_errmsg(db));
+		fprintf(stderr, "Error preparing %s\n",
+		    __func__, sqlite3_errmsg(db));
 		goto error;
 	}
 
@@ -280,13 +285,13 @@ db_update(const char *table, struct resultset *rs, const size_t column)
 				    table, ++rs->visits);
 		break;
 	default:
-		fprintf(stderr, "You brought some dirty garbage! "
-				"%lu ain't good value.\n", column);
+		fprintf(stderr, "(%s) You brought some dirty garbage! ",
+		    __func__, "%lu ain't good value.\n", column);
 		return rtrnval;
 	}
 	if ((rc = sqlite3_prepare_v2(db, q, strlen(q), &stmt, NULL)))
-		fprintf(stderr, "Error in function db_update() while preparing %s\n",
-			sqlite3_errmsg(db));
+		fprintf(stderr, "Error preparing %s\n",
+		    __func__, sqlite3_errmsg(db));
 
 	rtrnval = sqlite3_step(stmt);
 
