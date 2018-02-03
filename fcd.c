@@ -34,14 +34,6 @@ int	changedir(const char *);
 void	interactive(long long *);
 void	usage(void);
 
-int	aflag; /* Ask for the choice, cannot be combined with 'c' flag */
-int	bflag; /* Bookmark */
-int	cflag; /* Use curses, cannot be combined with 'a' flag */
-int	dflag; /* Maximum word difference in spellcheck */
-int	Dflag; /* Remove directory item */
-int	iflag; /* Case insensitive search */
-int	Iflag; /* Insert new directory item */
-int	tflag; /* Search for table {ETC, HOME, USR} */
 
 int
 main(int argc, const char *argv[])
