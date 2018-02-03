@@ -3,7 +3,7 @@ CFLAGS+= -std=c99 -g -Wall -Wextra -pedantic
 CFLAGS+= -Wstrict-prototypes -Wmissing-prototypes
 CFLAGS+= -Wmissing-declarations
 CFLAGS+= -Wshadow -Wpointer-arith -Wcast-qual
-CFLAGS+= -Wsign-compare
+CFLAGS+= -Wsign-compare -fdiagnostics-color
 SQLITEFLAGS=-L /usr/local/lib -lsqlite3
 CURSESFLAGS=-L/usr/lib -lmenu -lcurses
 OS=$(shell uname)
