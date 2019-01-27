@@ -15,7 +15,7 @@
 #include "extern.h"
 
 #define DB_NAME	"test.db"
-#define DB_PATH "/home/weezel/ohj/fcd"
+#define DB_PATH ".cache/fcd"
 
 struct resultset {
 	int bookmark;

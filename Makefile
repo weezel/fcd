@@ -9,7 +9,6 @@ CURSESFLAGS=-L/usr/lib -lmenu -lcurses
 OS=$(shell uname)
 
 ifeq ($(OS), Linux)
-	CFLAGS += -I /usr/local/include/linux
 	CURSESFLAGS+=-lbsd
 endif
 
@@ -21,26 +20,26 @@ endif
 
 all: spellcheckers dbutils choosewin controller
 	${CC} ${CFLAGS} spellcheckers.o dbutils.o \
-		choosewin.o controller.o fcd.c -o fcd ${CURSESFLAGS} ${SQLITEFLAGS}
+		choosewin.o controller.o src/fcd.c -o fcd ${CURSESFLAGS} ${SQLITEFLAGS}
 dbutils:
-	${CC} ${CFLAGS} dbutils.c -c -o dbutils.o
+	${CC} ${CFLAGS} src/dbutils.c -c -o dbutils.o
 controller:
-	${CC} ${CFLAGS} -c -o controller.o controller.c
+	${CC} ${CFLAGS} -c -o controller.o src/controller.c
 choosewin:
-	${CC} ${CFLAGS} -c -o choosewin.o choosewin.c
+	${CC} ${CFLAGS} -c -o choosewin.o src/choosewin.c
 dirindexer: dbutils
-	${CC} ${CFLAGS} dbutils.o dirindexer.c -c -o dirindexer.o
+	${CC} ${CFLAGS} dbutils.o src/dirindexer.c -c -o dirindexer.o
 spellcheckers:
-	${CC} ${CFLAGS} spellcheck.c -c -o spellcheckers.o
+	${CC} ${CFLAGS} src/spellcheck.c -c -o spellcheckers.o
 tests: dbutils dirindexer
-	#${CC} ${CFLAGS} dbutils.c tests.c -o dbutils_test
-	#${CC} ${CFLAGS} ${CURSESFLAGS} ${SQLITEFLAGS} controller.c dbutils.c choosewin.c -o controller_test
-	#${CC} ${CFLAGS} ${CURSESFLAGS} choosewin.c -c -o choosewin_test
-	${CC} ${CFLAGS} ${SQLITEFLAGS} dbutils.o dirindexer.o tests.c -o all_tests
+	#${CC} ${CFLAGS} src/dbutils.c src/tests.c -o dbutils_test
+	#${CC} ${CFLAGS} ${CURSESFLAGS} ${SQLITEFLAGS} src/controller.c src/dbutils.c src/choosewin.c -o controller_test
+	#${CC} ${CFLAGS} ${CURSESFLAGS} src/choosewin.c -c -o choosewin_test
+	${CC} ${CFLAGS} ${SQLITEFLAGS} dbutils.o dirindexer.o src/tests.c -o all_tests
 scanbuild:
 	scan-build -analyze-headers -o result_html -v -enable-checker debug.DumpCallGraph make
 lint:
-	lint -c -e -h -f -I /usr/local/include ${FILES}
+	lint -c -e -h -f ${FILES}
 
 clean:
 	rm -rf *.o *.core fcd *_test all_tests
