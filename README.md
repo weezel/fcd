@@ -6,7 +6,7 @@ spellchecking against the given name.
 
 
 # Motivation
-If you are like me and STILL (yes it's 2012, I know) operate mostly through
+If you are like me and operate mostly through
 terminal, this tool might come handy. A big amount of time is spend on
 navigating in a directory structure jungle. Since most of the time I wander
 around same directories, it would be neat to have a way to change directory
@@ -16,10 +16,6 @@ so `Fast CD` was born.
 Purpose of the program is to deliver a fast way to navigate trough Unix
 directory structure. The weight is in frequently visited directories so that
 those can be easily accessed.
-
-
-# Logic behind the program
---Unfinished--
 
 # Usage
 Find directory that has `test` in its name. Since there can be many search
