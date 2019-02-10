@@ -21,11 +21,17 @@ db_init(void)
 {
 	int	 rc;
 	int	 rv;
-	char	*db_path;
 	char	*db_name;
+	char	*db_path;
+	char	*home_path;
 
+	home_path = getenv("HOME");
 	db_path = DB_PATH;
 	db_name = DB_NAME;
+
+	if ((rv = chdir(home_path)) != 0)
+		err(1, "(%s) Cannot change directory to: %s",
+		    __func__, home_path);
 
 	if ((rv = chdir(db_path)) != 0)
 		err(1, "(%s) Cannot change directory to: %s",
